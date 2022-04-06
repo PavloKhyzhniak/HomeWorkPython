@@ -1,0 +1,42 @@
+
+
+--Выбирает информацию о пациентах с фамилиями, начинающимися на заданную параметром последовательность букв
+select u.*,a.* from Patient p
+join User u on p.UserId = u.Id 
+join Address a on a.Id = u.AddressId 
+where u.LastName like 'H%'
+
+--Выбирает информацию о врачах, для которых значение в поле Процент отчисления на зарплату, больше 2.3% (задавать параметром)
+select d.*,u.* from Doctors d
+join User u on d.UserId = u.Id 
+join Address a on a.Id = u.AddressId 
+where d.Rate>2.3
+
+--Выбирает информацию о приемах за некоторый период, заданный параметрами
+select v.*,u1.* , u2.* from Visit v
+join User u1 on v.PatientId = u1.Id 
+join User u2 on v.DoctorId = u2.Id 
+where v.Date > date('now','-1 month') and v.Date <  date('now','+1 month')
+
+--Выбирает информацию о докторах, специальность которых задана параметром 
+select * from Doctors d 
+join User u on u.Id = d.UserId 
+join Address a on a.Id = u.AddressId 
+where d.Specialization like 'T%'
+
+--Вычисляет размер заработной платы врача за каждый прием. Включает поля Фамилия врача, Имя врача, Отчество врача, Специальность врача, Стоимость приема, Зарплата. Сортировка по полю Специальность врача
+select u.*,SUM(Price*Rate/100),d.Specialization from visit v
+join Doctors d on v.DoctorId = d.Id
+join User u on u.Id = d.UserId 
+group by v.DoctorId
+
+--Выполняет группировку по полю Дата приема. Для каждой даты вычисляет максимальную стоимость приема
+select v.*,MAX(v.Price) from Visit v
+group by v.Date
+
+--Выполняет группировку по полю Специальность. Для каждой специальности вычисляет средний Процент отчисления на зарплату от стоимости приема
+select d.*,AVG(d.Rate) from Doctors d
+group by d.Specialization
+
+
+
